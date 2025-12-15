@@ -133,6 +133,9 @@ const (
 
 	// Kagent represents a repository with Kagent agents.
 	Kagent RepositoryKind = 28
+
+	// Buildpack represents a repository with Buildpacks.
+	Buildpack RepositoryKind = 29
 )
 
 // GetKindName returns the name of the provided repository kind.
@@ -144,6 +147,8 @@ func GetKindName(kind RepositoryKind) string {
 		return "backstage"
 	case Bootc:
 		return "bootc"
+	case Buildpack:
+		return "buildpack"
 	case Container:
 		return "container"
 	case CoreDNS:
@@ -211,6 +216,8 @@ func GetKindFromName(kind string) (RepositoryKind, error) {
 		return Backstage, nil
 	case "bootc":
 		return Bootc, nil
+	case "buildpack":
+		return Buildpack, nil
 	case "container":
 		return Container, nil
 	case "coredns":

@@ -125,6 +125,10 @@ const ICONS = {
     default: '/static/media/kagent.svg',
     white: '/static/media/kagent-light.svg',
   },
+  [RepositoryKind.Buildpack]: {
+    default: '/static/media/buildpacks_icon.png',
+    white: '/static/media/buildpacks-light.svg',
+  },
 };
 
 const RepositoryIcon = (props: Props) => {

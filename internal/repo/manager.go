@@ -83,6 +83,7 @@ var (
 		hub.ArgoTemplate,
 		hub.Backstage,
 		hub.Bootc,
+		hub.Buildpack,
 		hub.Container,
 		hub.CoreDNS,
 		hub.Falco,
