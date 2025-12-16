@@ -259,6 +259,17 @@ const HomeView = () => {
                           <small>Backstage plugins</small>
                         </div>
                       </div>
+                    </ExternalLink>                    <ExternalLink
+                      href="https://buildpacks.io"
+                      className={`col ${styles.iconLink}`}
+                      label="Open Buildpacks site"
+                    >
+                      <div className="d-flex flex-column justify-content-between align-items-center h-100">
+                        <RepositoryIcon kind={RepositoryKind.Buildpack} type="white" className={styles.aboutIcon} />
+                        <div className={`d-none d-sm-block text-light mt-2 ${styles.legendIcon}`}>
+                          <small>Buildpacks</small>
+                        </div>
+                      </div>
                     </ExternalLink>
                     <ExternalLink
                       href="https://containers.github.io/bootable/"
