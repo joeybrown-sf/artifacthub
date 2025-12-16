@@ -58,8 +58,10 @@ const getRepoKind = (repoName: string): RepositoryKind | null => {
       return RepositoryKind.RadiusRecipe;
     case 'bootc':
       return RepositoryKind.Bootc;
-    case 'buildpack':
-      return RepositoryKind.Buildpack;
+    case 'cnb-buildpack':
+      return RepositoryKind.CNBBuildpack;
+    case 'cnb-builder':
+      return RepositoryKind.CNBBuilder;
     case 'kagent':
       return RepositoryKind.Kagent;
     default:
@@ -125,8 +127,10 @@ const getRepoKindName = (repoKind: RepositoryKind): string | null => {
       return 'radius';
     case RepositoryKind.Bootc:
       return 'bootc';
-    case RepositoryKind.Buildpack:
-      return 'buildpack';
+    case RepositoryKind.CNBBuildpack:
+      return 'cnb-buildpack';
+    case RepositoryKind.CNBBuilder:
+      return 'cnb-builder';
     case RepositoryKind.Kagent:
       return 'kagent';
     default:

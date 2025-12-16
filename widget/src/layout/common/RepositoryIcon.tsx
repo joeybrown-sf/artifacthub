@@ -43,6 +43,8 @@ const ICONS: IconsList = {
   [RepositoryKind.RadiusRecipe]: <SVGIcons name="radius" />,
   [RepositoryKind.Bootc]: <SVGIcons name="bootc" />,
   [RepositoryKind.Kagent]: <SVGIcons name="kagent" />,
+  [RepositoryKind.CNBBuildpack]: <SVGIcons name="buildpack" />,
+  [RepositoryKind.CNBBuilder]: <SVGIcons name="buildpack" />,
 };
 
 const RepositoryIcon = (props: Props) => (

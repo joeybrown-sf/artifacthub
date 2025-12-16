@@ -30,7 +30,8 @@ export enum RepositoryKind {
   RadiusRecipe,
   Bootc,
   Kagent,
-  Buildpack,
+  CNBBuildpack,
+  CNBBuilder,
 }
 
 export enum PackageCategory {

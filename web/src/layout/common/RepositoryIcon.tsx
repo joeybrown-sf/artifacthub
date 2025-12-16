@@ -125,8 +125,12 @@ const ICONS = {
     default: '/static/media/kagent.svg',
     white: '/static/media/kagent-light.svg',
   },
-  [RepositoryKind.Buildpack]: {
-    default: '/static/media/buildpacks_icon.png',
+  [RepositoryKind.CNBBuildpack]: {
+    default: '/static/media/buildpacks.svg',
+    white: '/static/media/buildpacks-light.svg',
+  },
+  [RepositoryKind.CNBBuilder]: {
+    default: '/static/media/buildpacks.svg',
     white: '/static/media/buildpacks-light.svg',
   },
 };

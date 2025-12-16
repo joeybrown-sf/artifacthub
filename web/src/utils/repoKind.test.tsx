@@ -95,6 +95,14 @@ describe('repoKind', () => {
       expect(methods.getRepoKind('radius')).toBe(RepositoryKind.RadiusRecipe);
     });
 
+    it('cnb-buildpack', () => {
+      expect(methods.getRepoKind('cnb-buildpack')).toBe(RepositoryKind.CNBBuildpack);
+    });
+
+    it('cnb-builder', () => {
+      expect(methods.getRepoKind('cnb-builder')).toBe(RepositoryKind.CNBBuilder);
+    });
+
     it('unknown', () => {
       expect(methods.getRepoKind('unknown')).toBeNull();
     });
@@ -191,6 +199,14 @@ describe('repoKind', () => {
 
     it('radius recipe kind', () => {
       expect(methods.getRepoKindName(RepositoryKind.RadiusRecipe)).toBe('radius');
+    });
+
+    it('cnb-buildpack kind', () => {
+      expect(methods.getRepoKindName(RepositoryKind.CNBBuildpack)).toBe('cnb-buildpack');
+    });
+
+    it('cnb-builder kind', () => {
+      expect(methods.getRepoKindName(RepositoryKind.CNBBuilder)).toBe('cnb-builder');
     });
 
     it('unknown kind', () => {

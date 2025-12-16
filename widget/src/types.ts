@@ -57,7 +57,8 @@ export enum RepositoryKind {
   RadiusRecipe,
   Bootc,
   Kagent,
-  Buildpack,
+  CNBBuildpack,
+  CNBBuilder,
 }
 
 export interface SearchResults {
