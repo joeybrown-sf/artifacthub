@@ -134,11 +134,11 @@ const REPOSITORY_KINDS: RepoKindDef[] = [
   },
   {
     kind: RepositoryKind.CNBBuildpack,
-    name: 'CNB Buildpack',
+    name: 'Buildpack',
   },
   {
     kind: RepositoryKind.CNBBuilder,
-    name: 'CNB Builder',
+    name: 'Builder',
   },
 ];
 

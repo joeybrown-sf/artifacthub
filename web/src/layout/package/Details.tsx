@@ -95,6 +95,33 @@ const Details = (props: Props) => {
                 )}
               </>
             );
+          case RepositoryKind.CNBBuildpack:
+            return (
+              <>
+                {props.package.appVersion && (
+                  <div>
+                    <SmallTitle text="Buildpack API" />
+                    <p data-testid="appVersion" className={`text-truncate ${styles.text}`}>
+                      {props.package.appVersion}
+                    </p>
+                  </div>
+                )}
+              </>
+            );
+
+          case RepositoryKind.CNBBuilder:
+            return (
+              <>
+                {props.package.appVersion && (
+                  <div>
+                    <SmallTitle text="Lifecycle API" />
+                    <p data-testid="builder" className={`text-truncate ${styles.text}`}>
+                      {props.package.appVersion}
+                    </p>
+                  </div>
+                )}
+              </>
+            );
 
           case RepositoryKind.Container:
             return (
@@ -419,6 +446,52 @@ const Details = (props: Props) => {
                 )}
                 {props.package.data && props.package.data[HeadlampData.Flavors] && (
                   <Flavors title="Headlamp Flavors" flavors={props.package.data[HeadlampData.Flavors]} />
+                )}
+              </>
+            );
+
+          case RepositoryKind.CNBBuilder:
+          case RepositoryKind.CNBBuildpack:
+            // Extract architectures from platforms (e.g., "linux/amd64" -> "amd64")
+            const extractArchitectures = (platforms: string[] | null | undefined): string[] => {
+              if (!platforms || platforms.length === 0) return [];
+              const architectures = new Set<string>();
+              platforms.forEach((platform) => {
+                const parts = platform.split('/');
+                if (parts.length >= 2) {
+                  const arch = parts[parts.length - 1].toLowerCase();
+                  // Only include arm64 and amd64 architectures
+                  if (arch === 'arm64' || arch === 'amd64') {
+                    architectures.add(arch);
+                  }
+                }
+              });
+              return Array.from(architectures).sort();
+            };
+
+            const architectures = extractArchitectures(
+              props.package.data && props.package.data.platforms
+                ? (props.package.data.platforms as string[])
+                : null
+            );
+
+            return (
+              <>
+                {architectures.length > 0 && (
+                  <div>
+                    <SmallTitle text="Architecture" />
+                    <div className="mb-3 d-flex flex-row flex-wrap pt-1">
+                      {architectures.map((arch: string) => (
+                        <div
+                          data-testid="architectureBadge"
+                          className={`d-inline badge fw-normal me-2 mb-1 ${styles.badge}`}
+                          key={arch}
+                        >
+                          {arch}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 )}
               </>
             );

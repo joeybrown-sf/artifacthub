@@ -148,6 +148,8 @@ The `hub_server` alias runs the `hub` cmd, one of the two processes of the Artif
 
 The `tracker` is another backend cmd in charge of indexing registered repositories metadata. On production deployments, it is usually run periodically using a `cronjob` on Kubernetes. Locally while developing, you can just run it as often as you need as any other CLI tool. The tracker requires the [OPM cli tool](https://github.com/operator-framework/operator-registry/releases) to be installed and available in your PATH, and the [TensorFlow C library](https://www.tensorflow.org/install/lang_c), so please make sure it's available before proceeding.
 
+**Note for macOS users:** After extracting the TensorFlow C library to `/usr/local`, you may need to set the rpath when building/running the tracker. You can do this by setting `CGO_LDFLAGS="-Wl,-rpath,/usr/local/lib"` before running the tracker, or include it in your alias (see the [aliases section](#aliases) below).
+
 If you opened the url suggested before, you probably noticed there were no packages listed yet. This happened because no repositories had been indexed yet. If you used the configuration file suggested for Tern, some sample repositories should have been registered in the database owned by the `demo` user. To index them, we need to run the `tracker`.
 
 Similarly to the `hub` server, the `tracker` can be configured using a `yaml` file. We'll create one in `~/.cfg` named `tracker.yaml` with the following content (adjust as needed as usual ;):
@@ -259,7 +261,7 @@ alias hub_db_tests="pushd $HUB_SOURCE/database/tests; pg_prove --host localhost 
 alias hub_db_backup="pg_dump --data-only --exclude-table-data=repository_kind --exclude-table-data=event_kind -U postgres hub > $HUB_DB_BACKUP"
 alias hub_db_restore="psql -U postgres hub < $HUB_DB_BACKUP"
 alias hub_server="pushd $HUB_SOURCE/cmd/hub; go run -mod=readonly *.go; popd"
-alias hub_tracker="pushd $HUB_SOURCE/cmd/tracker; go run -mod=readonly main.go; popd"
+alias hub_tracker="pushd $HUB_SOURCE/cmd/tracker; CGO_LDFLAGS=\"-Wl,-rpath,/usr/local/lib\" go run -mod=readonly main.go; popd"
 alias hub_scanner="pushd $HUB_SOURCE/cmd/scanner; go run -mod=readonly main.go; popd"
 alias hub_backend_tests="pushd $HUB_SOURCE; go test -cover -race -mod=readonly -count=1 ./...; popd"
 alias hub_tests="hub_db_recreate_tests && hub_db_tests && hub_go_tests"
