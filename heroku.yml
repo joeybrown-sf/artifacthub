@@ -13,8 +13,10 @@ release:
 run:
   web: ./hub
   tracker:
-    command: ./tracker
+    command: 
+      - ./tracker
     image: tracker
   scanner: 
-    command: ./scanner
+    command: 
+      - ./scanner
     image: scanner
