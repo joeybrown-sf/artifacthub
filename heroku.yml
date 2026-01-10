@@ -3,12 +3,12 @@ build:
     web: cmd/hub/Dockerfile
     tracker: cmd/tracker/Dockerfile
     scanner: cmd/scanner/Dockerfile
-    release: database/migrations/Dockerfile
+    migrator: database/migrations/Dockerfile
 
 release:
   command:
     - ./migrate.sh
-  image: release
+  image: migrator
 
 run:
   web: ./hub
