@@ -20,8 +20,9 @@ if [ -z "$TERN_CONF" ] && [ -n "$DATABASE_URL" ]; then
     DB_HOST_PORT="${DB_HOST_PATH%%/*}"
     DB_NAME_PATH="${DB_HOST_PATH#*/}"
     
-    # Remove query parameters from database name
+    # Extract database name and query parameters
     DB_NAME="${DB_NAME_PATH%%\?*}"
+    QUERY_PARAMS="${DB_NAME_PATH#*\?}"
     
     # Split host and port
     DB_HOST="${DB_HOST_PORT%%:*}"
@@ -30,6 +31,25 @@ if [ -z "$TERN_CONF" ] && [ -n "$DATABASE_URL" ]; then
     # Set default port if not present
     if [ "$DB_PORT" = "$DB_HOST_PORT" ]; then
         DB_PORT="5432"
+    fi
+    
+    # Extract sslmode from query parameters if present
+    SSLMODE=""
+    if [ -n "$QUERY_PARAMS" ] && [ "$QUERY_PARAMS" != "$DB_NAME_PATH" ]; then
+        # Parse query parameters (POSIX-compliant)
+        remaining="$QUERY_PARAMS"
+        while [ -n "$remaining" ]; do
+            param="${remaining%%&*}"
+            remaining="${remaining#*&}"
+            if [ "$remaining" = "$param" ]; then
+                remaining=""
+            fi
+            case "$param" in
+                sslmode=*)
+                    SSLMODE="${param#sslmode=}"
+                    ;;
+            esac
+        done
     fi
     
     # Create tern.conf file
@@ -42,6 +62,9 @@ database = $DB_NAME
 user = $DB_USER
 password = $DB_PASS
 EOF
+    if [ -n "$SSLMODE" ]; then
+        echo "sslmode = $SSLMODE" >> "$TERN_CONF_FILE"
+    fi
     export TERN_CONF="$TERN_CONF_FILE"
     echo "Created tern.conf from DATABASE_URL"
 fi

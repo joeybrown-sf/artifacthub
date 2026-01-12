@@ -8,8 +8,8 @@ db:
   user: postgres
 server:
   shutdownTimeout: 10s
-  webBuildPath: ../../web/build
-  widgetBuildPath: ../../widget/build
+  webBuildPath: ./web
+  widgetBuildPath: ./widget
   basicAuth:
     enabled: false
     username: hub
