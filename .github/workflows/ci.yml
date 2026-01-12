@@ -39,6 +39,7 @@ jobs:
             localhost:5000/web:latest
           push: true
           platforms: linux/amd64
+          provenance: false
 
       - uses: imjasonh/setup-crane@v0.1
 
