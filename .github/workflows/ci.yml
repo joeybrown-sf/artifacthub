@@ -52,9 +52,33 @@ jobs:
           crane copy localhost:5000/web:latest registry.heroku.com/stark-eyrie-63979/web
 
       - name: Release the web image to Heroku
+        env:
+          APP_NAME: stark-eyrie-63979
+          PROCESS_TYPE: web
+          HEROKU_TOKEN: ${{ secrets.HEROKU_API_TOKEN }}
         run: |
-          curl -X POST https://api.heroku.com/apps/stark-eyrie-63979/releases \
+          # Get the image digest from the registry
+          MANIFEST=$(curl -s -X GET \
+            "https://registry.heroku.com/v2/${APP_NAME}/${PROCESS_TYPE}/manifests/latest" \
+            -H "Accept: application/vnd.docker.distribution.manifest.v2+json" \
+            -H "Authorization: Basic $(echo -n :${HEROKU_TOKEN} | base64)")
+          
+          # Extract digest (for v2 schema)
+          IMAGE_DIGEST=$(echo $MANIFEST | jq -r '.config.digest')
+          
+          echo "Image digest: ${IMAGE_DIGEST}"
+          
+          # Release the image using the formation API
+          curl -X PATCH \
+            "https://api.heroku.com/apps/${APP_NAME}/formation" \
+            -H "Accept: application/vnd.heroku+json; version=3.docker-releases" \
+            -H "Authorization: Bearer ${HEROKU_TOKEN}" \
             -H "Content-Type: application/json" \
-            -H "Accept: application/vnd.heroku+json; version=3" \
-            -H "Authorization: Bearer ${{ secrets.HEROKU_API_TOKEN }}" \
-            -d '{"update": {"processes": {"web": "registry.heroku.com/stark-eyrie-63979/web"}}}'
+            -d "{
+              \"updates\": [
+                {
+                  \"type\": \"${PROCESS_TYPE}\",
+                  \"docker_image\": \"${IMAGE_DIGEST}\"
+                }
+              ]
+            }"
