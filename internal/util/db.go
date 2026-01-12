@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"net/url"
+	"os"
 	"time"
 
 	"github.com/artifacthub/hub/internal/hub"
@@ -27,14 +28,24 @@ var ErrDBInsufficientPrivilege = errors.New("ERROR: insufficient_privilege (SQLS
 // SetupDB creates a database connection pool using the configuration provided.
 func SetupDB(cfg *viper.Viper) (*pgxpool.Pool, error) {
 	// Setup pool config
-	url := fmt.Sprintf("postgres://%s:%s@%s:%s/%s",
-		url.QueryEscape(cfg.GetString("db.user")),
-		url.QueryEscape(cfg.GetString("db.password")),
-		cfg.GetString("db.host"),
-		cfg.GetString("db.port"),
-		cfg.GetString("db.database"),
-	)
-	poolConfig, err := pgxpool.ParseConfig(url)
+
+	// If DATABASE_URL is set, use it
+
+	var dbURL string
+
+	if os.Getenv("DATABASE_URL") != "" {
+		dbURL = os.Getenv("DATABASE_URL")
+	} else {
+		dbURL = fmt.Sprintf("postgres://%s:%s@%s:%s/%s",
+			url.QueryEscape(cfg.GetString("db.user")),
+			url.QueryEscape(cfg.GetString("db.password")),
+			cfg.GetString("db.host"),
+			cfg.GetString("db.port"),
+			cfg.GetString("db.database"),
+		)
+	}
+
+	poolConfig, err := pgxpool.ParseConfig(dbURL)
 	if err != nil {
 		return nil, err
 	}

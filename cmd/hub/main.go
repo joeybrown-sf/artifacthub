@@ -163,6 +163,10 @@ func main() {
 // setCfgDefaults sets the default values for some configuration options.
 func setCfgDefaults(cfg *viper.Viper) {
 	cfg.SetDefault("server.addr", "0.0.0.0:8000")
+	// Override server.addr with PORT environment variable if set
+	if port := os.Getenv("PORT"); port != "" {
+		cfg.Set("server.addr", "0.0.0.0:"+port)
+	}
 	cfg.SetDefault("server.allowUserSignUp", true)
 	cfg.SetDefault("server.baseURL", "http://localhost:8000")
 	cfg.SetDefault("server.cookie.hashKey", "sample hash key")

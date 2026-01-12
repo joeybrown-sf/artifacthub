@@ -44,5 +44,7 @@ COPY --from=frontend-builder /web/package.json ./web
 COPY --from=widget-builder /widget/build ./widget
 COPY --from=docs-builder /web/build/docs ./web/docs
 COPY --from=docs-builder /docs/api ./web/docs/api
+RUN mkdir -p ~/.cfg
+COPY cmd/hub/heroku-deploy.yaml ~/.cfg/hub.yaml
 CMD ["./hub"]
 EXPOSE 8000
