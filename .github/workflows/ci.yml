@@ -38,8 +38,6 @@ jobs:
           tags: |
             localhost:5000/web:latest
           push: true
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
           platforms: linux/amd64
 
       - uses: imjasonh/setup-crane@v0.1
