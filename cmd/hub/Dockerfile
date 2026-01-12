@@ -36,7 +36,6 @@ RUN hugo
 # Final stage
 FROM alpine:3.22.2
 RUN apk --no-cache add ca-certificates && addgroup -S hub -g 1000 && adduser -S hub -u 1000 -G hub
-USER 1000
 WORKDIR /home/hub
 COPY --from=backend-builder /hub ./
 COPY --from=frontend-builder /web/build ./web
@@ -44,7 +43,9 @@ COPY --from=frontend-builder /web/package.json ./web
 COPY --from=widget-builder /widget/build ./widget
 COPY --from=docs-builder /web/build/docs ./web/docs
 COPY --from=docs-builder /docs/api ./web/docs/api
-RUN mkdir -p ~/.cfg
-COPY cmd/hub/heroku-deploy.yaml ~/.cfg/hub.yaml
+RUN mkdir -p /home/hub/.cfg
+COPY cmd/hub/heroku-deploy.yaml /home/hub/.cfg/hub.yaml
+RUN chown -R 1000:1000 /home/hub/.cfg /home/hub
+USER 1000
 CMD ["./hub"]
 EXPOSE 8000
