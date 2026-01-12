@@ -8,6 +8,7 @@ on:
 jobs:
   push-to-heroku:
     runs-on: ubuntu-latest
+    environment: Production
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -33,35 +34,35 @@ jobs:
           cache-to: type=gha,mode=max
           platforms: linux/amd64
 
-      - name: Build and push tracker image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: ./cmd/tracker/Dockerfile
-          tags: registry.heroku.com/stark-eyrie-63979/tracker
-          push: true
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          platforms: linux/amd64
+      # - name: Build and push tracker image
+      #   uses: docker/build-push-action@v5
+      #   with:
+      #     context: .
+      #     file: ./cmd/tracker/Dockerfile
+      #     tags: registry.heroku.com/stark-eyrie-63979/tracker
+      #     push: true
+      #     cache-from: type=gha
+      #     cache-to: type=gha,mode=max
+      #     platforms: linux/amd64
 
-      - name: Build and push scanner image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: ./cmd/scanner/Dockerfile
-          tags: registry.heroku.com/stark-eyrie-63979/scanner
-          push: true
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          platforms: linux/amd64
+      # - name: Build and push scanner image
+      #   uses: docker/build-push-action@v5
+      #   with:
+      #     context: .
+      #     file: ./cmd/scanner/Dockerfile
+      #     tags: registry.heroku.com/stark-eyrie-63979/scanner
+      #     push: true
+      #     cache-from: type=gha
+      #     cache-to: type=gha,mode=max
+      #     platforms: linux/amd64
 
-      - name: Build and push migrator image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: ./database/migrations/Dockerfile
-          tags: registry.heroku.com/stark-eyrie-63979/migrator
-          push: true
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          platforms: linux/amd64
+      # - name: Build and push migrator image
+      #   uses: docker/build-push-action@v5
+      #   with:
+      #     context: .
+      #     file: ./database/migrations/Dockerfile
+      #     tags: registry.heroku.com/stark-eyrie-63979/migrator
+      #     push: true
+      #     cache-from: type=gha
+      #     cache-to: type=gha,mode=max
+      #     platforms: linux/amd64
