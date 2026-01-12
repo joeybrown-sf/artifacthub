@@ -1,22 +1,6 @@
 build:
   docker:
     web: cmd/hub/Dockerfile
-    tracker: cmd/tracker/Dockerfile
-    scanner: cmd/scanner/Dockerfile
-    migrator: database/migrations/Dockerfile
-
-release:
-  command:
-    - ./migrate.sh
-  image: migrator
 
 run:
   web: ./hub
-  tracker:
-    command: 
-      - ./tracker
-    image: tracker
-  scanner: 
-    command: 
-      - ./scanner
-    image: scanner
