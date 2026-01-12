@@ -1006,6 +1006,8 @@ const RepositoryModal = (props: Props) => {
               RepositoryKind.OpenCost,
               RepositoryKind.RadiusRecipe,
               RepositoryKind.Bootc,
+              RepositoryKind.CNBBuildpack,
+              RepositoryKind.CNBBuilder,
             ].includes(selectedKind) && (
               <div>
                 <InputField

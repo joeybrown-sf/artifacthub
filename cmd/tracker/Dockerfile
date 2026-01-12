@@ -1,16 +1,27 @@
 # Build tracker
 FROM golang:1.25.3-trixie AS builder
+# Install build essentials for CGO compilation
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    gcc \
+    g++ \
+    && rm -rf /var/lib/apt/lists/*
 WORKDIR /tmp
 ENV LIBTENSORFLOW_TGZ=libtensorflow-cpu-linux-x86_64-2.11.0.tar.gz
-RUN wget -q --no-check-certificate https://storage.googleapis.com/tensorflow/libtensorflow/$LIBTENSORFLOW_TGZ
-RUN tar -C /usr/local -xzf $LIBTENSORFLOW_TGZ
-RUN ldconfig /usr/local/lib
+# Download and extract TensorFlow, then clean up immediately
+RUN wget -q --no-check-certificate https://storage.googleapis.com/tensorflow/libtensorflow/$LIBTENSORFLOW_TGZ \
+    && tar -C /usr/local -xzf $LIBTENSORFLOW_TGZ \
+    && rm -f $LIBTENSORFLOW_TGZ \
+    && ldconfig /usr/local/lib
 WORKDIR /go/src/github.com/artifacthub/hub
 COPY go.* ./
 COPY cmd/tracker cmd/tracker
 COPY internal internal
 WORKDIR /go/src/github.com/artifacthub/hub/cmd/tracker
-RUN CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -o /tracker .
+# Build and clean up build artifacts and caches immediately to save space
+RUN CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -o /tracker . \
+    && go clean -cache -modcache -testcache \
+    && rm -rf /tmp/* /var/tmp/*
 
 # Final stage
 FROM debian:trixie-slim
@@ -29,8 +40,13 @@ RUN apt-get install -y wget \
     && chmod +x /usr/local/bin/opm \
     && apt-get remove -y wget \
     && ldconfig /usr/local/lib
-USER 1000
 WORKDIR /home/tracker
 COPY ml ./ml
-COPY --from=builder /tracker ./
+RUN mkdir -p /home/tracker/cmd/tracker
+COPY --from=builder /tracker /home/tracker/cmd/tracker/tracker
+RUN mkdir -p /home/tracker/.cfg
+COPY configs/tracker.yaml /home/tracker/.cfg/tracker.yaml
+RUN chown -R 1000:1000 /home/tracker/.cfg /home/tracker
+USER 1000
+WORKDIR /home/tracker/cmd/tracker
 CMD ["./tracker"]
