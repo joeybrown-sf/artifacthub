@@ -188,6 +188,8 @@ func (t *Tracker) cloneRepository() (string, string, error) {
 		hub.ArgoTemplate,
 		hub.Backstage,
 		hub.Bootc,
+		hub.CNBBuildpack,
+		hub.CNBBuilder,
 		hub.CoreDNS,
 		hub.Falco,
 		hub.Gatekeeper,

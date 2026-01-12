@@ -116,6 +116,8 @@ func SetupSource(i *hub.TrackerSourceInput) hub.TrackerSource {
 		hub.ArgoTemplate,
 		hub.Backstage,
 		hub.Bootc,
+		hub.CNBBuildpack,
+		hub.CNBBuilder,
 		hub.CoreDNS,
 		hub.Gatekeeper,
 		hub.Headlamp,

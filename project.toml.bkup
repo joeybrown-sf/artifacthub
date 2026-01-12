@@ -1,0 +1,8 @@
+[_]
+schema-version = "0.2"
+
+[[io.buildpacks.group]]
+uri = "../joeybrown-buildpacks/tensorflow-api/packaged/aarch64-unknown-linux-musl/debug/joeybrown-sf_tensorflow-api"
+
+[[io.buildpacks.group]]
+id = "heroku/go"

@@ -133,6 +133,12 @@ const (
 
 	// Kagent represents a repository with Kagent agents.
 	Kagent RepositoryKind = 28
+
+	// CNBBuildpack represents a repository with CNB Buildpacks.
+	CNBBuildpack RepositoryKind = 29
+
+	// CNBBuilder represents a repository with CNB Builders.
+	CNBBuilder RepositoryKind = 30
 )
 
 // GetKindName returns the name of the provided repository kind.
@@ -144,6 +150,10 @@ func GetKindName(kind RepositoryKind) string {
 		return "backstage"
 	case Bootc:
 		return "bootc"
+	case CNBBuildpack:
+		return "cnb-buildpack"
+	case CNBBuilder:
+		return "cnb-builder"
 	case Container:
 		return "container"
 	case CoreDNS:
@@ -211,6 +221,10 @@ func GetKindFromName(kind string) (RepositoryKind, error) {
 		return Backstage, nil
 	case "bootc":
 		return Bootc, nil
+	case "cnb-buildpack":
+		return CNBBuildpack, nil
+	case "cnb-builder":
+		return CNBBuilder, nil
 	case "container":
 		return Container, nil
 	case "coredns":

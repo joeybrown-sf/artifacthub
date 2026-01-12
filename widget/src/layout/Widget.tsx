@@ -108,6 +108,10 @@ const getRepoKindName = (repoKind: RepositoryKind): string | null => {
       return 'bootc';
     case RepositoryKind.Kagent:
       return 'kagent';
+    case RepositoryKind.CNBBuildpack:
+      return 'cnb-buildpack';
+    case RepositoryKind.CNBBuilder:
+      return 'cnb-builder';
     default:
       return null;
   }

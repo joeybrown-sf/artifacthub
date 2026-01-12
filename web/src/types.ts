@@ -30,6 +30,8 @@ export enum RepositoryKind {
   RadiusRecipe,
   Bootc,
   Kagent,
+  CNBBuildpack,
+  CNBBuilder,
 }
 
 export enum PackageCategory {
@@ -88,6 +90,14 @@ export enum VersioningOption {
 
 export enum RadiusRecipeData {
   Recipe = 'recipe',
+}
+
+export enum CNBBuildpackData {
+  Buildpack = 'buildpack',
+}
+
+export enum CNBBuilderData {
+  Builder = 'builder',
 }
 
 export interface Repository {
@@ -286,6 +296,8 @@ export interface PackageData {
   tasks?: TektonTaskInPipeline[];
   alternativeLocations?: string[];
   [RadiusRecipeData.Recipe]?: { [key: string]: string };
+  [CNBBuildpackData.Buildpack]?: string;
+  [CNBBuilderData.Builder]?: string;
 }
 
 export interface TektonTaskInPipeline {

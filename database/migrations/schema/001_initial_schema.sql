@@ -292,7 +292,3 @@ create table if not exists opt_out (
     event_kind_id integer not null references event_kind on delete restrict,
     unique (user_id, repository_id, event_kind_id)
 );
-
-{{ if eq .loadSampleData "true" }}
-{{ template "data/sample.sql" }}
-{{ end }}

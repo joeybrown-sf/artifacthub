@@ -132,6 +132,14 @@ const REPOSITORY_KINDS: RepoKindDef[] = [
     kind: RepositoryKind.Kagent,
     name: 'Kagent agent',
   },
+  {
+    kind: RepositoryKind.CNBBuildpack,
+    name: 'Buildpack',
+  },
+  {
+    kind: RepositoryKind.CNBBuilder,
+    name: 'Builder',
+  },
 ];
 
 const Wrapper = styled('span')`
