@@ -100,8 +100,6 @@ db:
   database: hub
   user: postgres
 server:
-  addr: localhost:8000
-  metricsAddr: localhost:8001
   shutdownTimeout: 10s
   webBuildPath: ../../web/build
   widgetBuildPath: ../../widget/build
