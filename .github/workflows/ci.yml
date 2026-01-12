@@ -43,30 +43,20 @@ jobs:
 
       - uses: imjasonh/setup-crane@v0.1
 
-      - name: Get manifest from local registry
-        run: |
-          crane manifest localhost:5000/web:latest | jq
-
-      - name: Push web image to Heroku
-        run: |
-          crane copy localhost:5000/web:latest registry.heroku.com/stark-eyrie-63979/web
-
-      - name: Release the web image to Heroku
+      - name: Get image digest and push to Heroku
         env:
           APP_NAME: stark-eyrie-63979
           PROCESS_TYPE: web
           HEROKU_TOKEN: ${{ secrets.HEROKU_API_TOKEN }}
         run: |
-          # Get the image digest from the registry
-          MANIFEST=$(curl -s -X GET \
-            "https://registry.heroku.com/v2/${APP_NAME}/${PROCESS_TYPE}/manifests/latest" \
-            -H "Accept: application/vnd.docker.distribution.manifest.v2+json" \
-            -H "Authorization: Basic $(echo -n :${HEROKU_TOKEN} | base64)")
-          
-          # Extract digest (for v2 schema)
+          # Get the manifest from local registry and extract the digest
+          MANIFEST=$(crane manifest localhost:5000/web:latest)
           IMAGE_DIGEST=$(echo $MANIFEST | jq -r '.config.digest')
           
           echo "Image digest: ${IMAGE_DIGEST}"
+          
+          # Push image to Heroku
+          crane copy localhost:5000/web:latest registry.heroku.com/${APP_NAME}/${PROCESS_TYPE}
           
           # Release the image using the formation API
           curl -X PATCH \
