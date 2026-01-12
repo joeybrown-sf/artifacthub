@@ -47,4 +47,14 @@ jobs:
         run: |
           crane manifest localhost:5000/web:latest | jq
 
-      # registry.heroku.com/stark-eyrie-63979/web
+      - name: Push web image to Heroku
+        run: |
+          crane copy localhost:5000/web:latest registry.heroku.com/stark-eyrie-63979/web
+
+      - name: Release the web image to Heroku
+        run: |
+          curl -X POST https://api.heroku.com/apps/stark-eyrie-63979/releases \
+            -H "Content-Type: application/json" \
+            -H "Accept: application/vnd.heroku+json; version=3" \
+            -H "Authorization: Bearer ${{ secrets.HEROKU_API_TOKEN }}" \
+            -d '{"update": {"processes": {"web": "registry.heroku.com/stark-eyrie-63979/web"}}}'
