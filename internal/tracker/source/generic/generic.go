@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/BurntSushi/toml"
 	"github.com/artifacthub/hub/internal/hub"
 	"github.com/artifacthub/hub/internal/oci"
 	"github.com/artifacthub/hub/internal/pkg"
@@ -54,6 +55,22 @@ const (
 	// contains the raw recipe files.
 	RadiusRecipeKey = "recipe"
 
+	// BuildpackKey represents the key used in the package's data field that
+	// contains the buildpack.toml content.
+	BuildpackKey = "buildpack"
+
+	// BuildpackAPIKey represents the key used in the package's data field that
+	// contains the buildpack API version.
+	BuildpackAPIKey = "appVersion"
+
+	// CNBRegistryIDKey represents the key used in the package's data field that
+	// contains the buildpack ID from buildpack.toml.
+	CNBRegistryIDKey = "cnbRegistryID"
+
+	// AllLicensesKey represents the key used in the package's data field that
+	// contains all licenses.
+	AllLicensesKey = "licenses"
+
 	// argoTemplateManifests represents the filename that contains the Argo
 	// template manifests.
 	argoTemplateManifests = "manifests.yaml"
@@ -85,6 +102,10 @@ const (
 	// radiusTFRecipeVariables represents the filename that contains the
 	// variables used by the Radius recipe file in Terraform format.
 	radiusTFRecipeVariables = "variables.tf"
+
+	// buildpackTOMLFile represents the filename that contains the buildpack
+	// TOML file.
+	buildpackTOMLFile = "buildpack.toml"
 )
 
 // TrackerSource is a hub.TrackerSource implementation used by several kinds
@@ -248,6 +269,8 @@ func PreparePackage(r *hub.Repository, md *hub.PackageMetadata, pkgPath string) 
 		kindData, err = prepareOPAData(pkgPath, ignorer)
 	case hub.Radius:
 		kindData, err = prepareRadiusData(pkgPath)
+	case hub.CNBBuildpack:
+		kindData, err = prepareBuildpackData(pkgPath, p)
 	}
 	if err != nil {
 		return nil, fmt.Errorf("error preparing package %s version %s data: %w", md.Name, md.Version, err)
@@ -457,6 +480,120 @@ func prepareRadiusData(pkgPath string) (map[string]interface{}, error) {
 	return map[string]interface{}{
 		RadiusRecipeKey: files,
 	}, nil
+}
+
+type buildpackTarget struct {
+	OS   string `toml:"os"`
+	Arch string `toml:"arch"`
+}
+
+type buildpackLicense struct {
+	Type string `toml:"type"`
+}
+
+type buildpackInfo struct {
+	ID          string             `toml:"id"`
+	Name        string             `toml:"name"`
+	HomePage    string             `toml:"homepage"`
+	Description string             `toml:"description"`
+	Version     string             `toml:"version"`
+	KeywordsRaw string             `toml:"keywords"`
+	Licenses    []buildpackLicense `toml:"licenses"`
+}
+
+type buildpackTOML struct {
+	API       string            `toml:"api"`
+	Buildpack buildpackInfo     `toml:"buildpack"`
+	Targets   []buildpackTarget `toml:"targets"`
+}
+
+func prepareBuildpackData(pkgPath string, p *hub.Package) (map[string]interface{}, error) {
+	buildpackPath := path.Join(pkgPath, buildpackTOMLFile)
+	content, err := util.ReadRegularFile(buildpackPath)
+	if err != nil {
+		if errors.Is(err, os.ErrNotExist) {
+			return nil, fmt.Errorf("error reading buildpack.toml: file not found")
+		}
+		return nil, fmt.Errorf("error reading buildpack.toml: %w", err)
+	}
+
+	var buildpackData buildpackTOML
+	if _, err := toml.Decode(string(content), &buildpackData); err != nil {
+		return nil, fmt.Errorf("error parsing buildpack.toml: %w", err)
+	}
+
+	if p.Version != buildpackData.Buildpack.Version {
+		return nil, fmt.Errorf("invalid buildpack: version mismatch between package and buildpack.toml: %s != %s", p.Version, buildpackData.Buildpack.Version)
+	}
+
+	if p.Description == "" {
+		p.Description = buildpackData.Buildpack.Description
+	}
+
+	if p.AppVersion == "" {
+		p.AppVersion = buildpackData.API
+	}
+
+	if p.HomeURL == "" {
+		p.HomeURL = buildpackData.Buildpack.HomePage
+	}
+
+	if p.DisplayName == "" {
+		p.DisplayName = buildpackData.Buildpack.Name
+	}
+
+	if len(p.Keywords) == 0 {
+		keywords := strings.SplitSeq(buildpackData.Buildpack.KeywordsRaw, ",")
+		for keyword := range keywords {
+			p.Keywords = append(p.Keywords, strings.TrimSpace(keyword))
+		}
+	}
+
+	platforms := make([]string, 0, len(buildpackData.Targets))
+	for _, target := range buildpackData.Targets {
+		if target.OS != "" && target.Arch != "" {
+			platforms = append(platforms, fmt.Sprintf("%s/%s", target.OS, target.Arch))
+		}
+	}
+	if len(platforms) > 0 {
+		if buildpackData.Buildpack.Name != "" {
+			for _, img := range p.ContainersImages {
+				img.Name = buildpackData.Buildpack.Name
+			}
+		}
+		for _, img := range p.ContainersImages {
+			if len(img.Platforms) == 0 {
+				img.Platforms = platforms
+			}
+		}
+	}
+
+	licenses := make([]string, 0, len(buildpackData.Buildpack.Licenses))
+	if p.License != "" {
+		licenses = append(licenses, p.License)
+	}
+	for _, license := range buildpackData.Buildpack.Licenses {
+		if license.Type != p.License {
+			licenses = append(licenses, license.Type)
+		}
+	}
+
+	if len(licenses) > 0 {
+		p.License = licenses[0]
+	}
+
+	data := make(map[string]interface{})
+
+	data[AllLicensesKey] = licenses
+
+	if buildpackData.Buildpack.ID != "" {
+		data[CNBRegistryIDKey] = buildpackData.Buildpack.ID
+	}
+	if len(licenses) > 0 {
+		data["licenses"] = licenses
+	}
+
+	return data, nil
 }
 
 // GetFilesWithSuffix returns the files with a given suffix in the path
